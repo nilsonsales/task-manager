@@ -92,13 +92,17 @@ def display_task_in_home(task):
         st.markdown('**The task below is overdue!**')
 
     # Use the task ID as the key for the session state variable
-    if task_id not in state:
-        state[task_id] = task['is_completed']
+    if 'state' not in st.session_state:
+        st.session_state.state = {}
 
-    is_completed = st.checkbox(f'{task_name}: {task_description}', value=task['is_completed'])
+    # Use the task ID as the key for the session state variable
+    if task_id not in st.session_state.state:
+        st.session_state.state[task_id] = task['is_completed']
 
-    if is_completed != state[task_id]:
-        state[task_id] = is_completed  # Update the session state
+    is_completed = st.checkbox(f'{task_name}: {task_description}', value=st.session_state.state[task_id])
+
+    if is_completed != st.session_state.state[task_id]:
+        st.session_state.state[task_id] = is_completed  # Update the session state
         if is_completed:
             services.task_manager.update_task(task_id, {'is_completed': True})
         else:
