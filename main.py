@@ -17,6 +17,8 @@ PRIORITY_NUMBER = {
 
 
 def main():
+    st.set_page_config(page_title='Simple Task Manager')
+
     selected_tab = st.sidebar.radio('Navigation',
                                     ('Home', 'Add Task', 'Tasks Details'))
 
@@ -24,7 +26,7 @@ def main():
         display_home()
     elif selected_tab == 'Add Task':
         display_add_task()
-    elif selected_tab == 'Task Details':
+    elif selected_tab == 'Tasks Details':
         display_tasks_details()
 
 
