@@ -99,7 +99,7 @@ def display_task_in_home(task):
     if task_id not in st.session_state.state:
         st.session_state.state[task_id] = task['is_completed']
 
-    is_completed = st.checkbox(f'{task_name}: {task_description}', value=st.session_state.state[task_id])
+    is_completed = st.checkbox(f'{task_name}: {task_description}', value=st.session_state.state[task_id], key=task_id)
 
     if is_completed != st.session_state.state[task_id]:
         st.session_state.state[task_id] = is_completed  # Update the session state
