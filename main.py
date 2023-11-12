@@ -57,15 +57,15 @@ def display_home():
     st.title('Simple Task Manager')
 
     # Selectbox for filtering tasks
-    filter_options = ['In Progress', 'Completed', 'All']
-    filter_selection = st.selectbox('Filter Tasks', filter_options)
+    filter_options = ['Tasks in progress', 'Tasks completed', 'All tasks']
+    filter_selection = st.selectbox('', filter_options)
 
     # Filter tasks based on selection
-    if filter_selection == 'In Progress':
+    if filter_selection == 'Tasks in progress':
         filtered_tasks = services.task_manager.list_in_progress_tasks()
-    elif filter_selection == 'Completed':
+    elif filter_selection == 'Tasks completed':
         filtered_tasks = services.task_manager.list_completed_tasks()
-    elif filter_selection == 'All':
+    elif filter_selection == 'All tasks':
         filtered_tasks = services.task_manager.list_all_tasks()
 
     high_priority_tasks = filtered_tasks[filtered_tasks['priority'] == 3]
