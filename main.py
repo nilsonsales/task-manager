@@ -24,8 +24,8 @@ def main():
     # If not authenticated, show the login screen
     if not st.session_state.user["authenticated"]:
         st.title("Login")
-        username = st.text_input("Username")
-        password = st.text_input("Password", type="password")
+        username = st.text_input("Username").strip()
+        password = st.text_input("Password", type="password").strip()
         if st.button("Login"):
             if authenticate(username, password):
                 st.success("Login successful!")
