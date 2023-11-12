@@ -1,9 +1,10 @@
 import subprocess
-from main import main
+import logging
+
+logger = logging.getLogger()
 
 def run_main():
-    print('running main.py')
-    #main()
+    logger.info('Starting Streamlit app')
     subprocess.run(["streamlit", "run", "main.py"])
 
 if __name__ == "__main__":

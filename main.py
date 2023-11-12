@@ -6,6 +6,7 @@ import services
 from streamlit import session_state as state
 from datetime import datetime
 
+
 logger = logging.getLogger()
 
 PRIORITY_NUMBER = {
@@ -17,7 +18,7 @@ PRIORITY_NUMBER = {
 
 def main():
     selected_tab = st.sidebar.radio('Navigation',
-                                    ('Home', 'Add Task', 'Task Details'))
+                                    ('Home', 'Add Task', 'Tasks Details'))
 
     if selected_tab == 'Home':
         display_home()
@@ -28,6 +29,7 @@ def main():
 
 
 def display_home():
+    """Displays the home page of the Simple Task Manager app."""
     st.title('Simple Task Manager')
     st.write("Here's a list of all your tasks in progress:")
 
@@ -42,9 +44,9 @@ def display_home():
     low_priority_tasks = in_progress_tasks[in_progress_tasks['priority'] == 1]
     display_tasks_in_home(low_priority_tasks, "# Low Priority", "green")
 
+
 def display_tasks_in_home(tasks, subheader, color):
     if not tasks.empty:
-        #st.subheader(subheader)
         st.markdown(f'<h3 style="font-size: 1.5em; color: {color}; opacity: 0.8">{subheader}</h3>', unsafe_allow_html=True)
         for _, task in tasks.iterrows():
             display_task_in_home(task)
@@ -75,6 +77,7 @@ def display_task_in_home(task):
 
 
 def display_add_task():
+    """Displays a form for adding a new task."""
     st.title('Add new task')
 
     # Text input fields
@@ -98,7 +101,7 @@ def display_add_task():
 
 
 def process_form_data(task_name, task_description, due_date, priority, is_completed):
-    # Process the form data here (e.g., save to a database, perform actions)
+    """Processes the form data and inserts it into the database."""
     st.write('Task name:', task_name)
     st.write('Task description:', task_description)
     st.write('Due date:', due_date)
@@ -117,6 +120,8 @@ def process_form_data(task_name, task_description, due_date, priority, is_comple
 
 
 def display_tasks_details():
+    """Displays a list of tasks and their details."""
+    st.title('Tasks Details')
     # Selectbox for filtering tasks
     filter_options = ['All', 'Completed', 'In Progress']
     filter_selection = st.selectbox('Filter Tasks', filter_options)

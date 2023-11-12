@@ -6,6 +6,19 @@ logger = logging.getLogger(__name__)
 
 class Database:
     def __init__(self, credentials):
+        """
+        Initializes a new instance of the class.
+        Parameters:
+            credentials (dict): A dictionary containing the credentials for the database connection.
+                The dictionary must have the following keys:
+                - host (str): The host name or IP address of the database server.
+                - user (str): The username for the database connection.
+                - password (str): The password for the database connection.
+                - db_name (str): The name of the database to connect to.
+                - port (int): The port number for the database connection.
+        Returns:
+            None
+        """
         self.host = credentials['host']
         self.user = credentials['user']
         self.password = credentials['password']
