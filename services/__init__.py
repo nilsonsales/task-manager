@@ -1,32 +1,33 @@
-import os
+import streamlit as st
 
 from .database import Database
 from .task_manager import TaskManager
 from .logging import setup_logger
 
 
-ENV = os.getenv("PROFILE", "dev")
-LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
+# Setup the app title
+st.set_page_config(page_title='Simple Task Manager')
 
-logger = setup_logger(LOG_LEVEL)
+# Setup logger
+logger = setup_logger()
 
-
-credentials = {
-    'user': os.environ.get('DB_USER'),
-    'password': os.environ.get('DB_PASS'),
-    'host': os.environ.get('DB_HOST'),
-    'port': os.environ.get('DB_PORT'),
-    'db_name': os.environ.get('DB_NAME'),
-}
-
+# Connect to the database
 logger.debug('Connecting to database')
 try:
-    database = Database(credentials)
+    credentials = {
+        'username': st.secrets['database'].get('username'),
+        'password': st.secrets['database'].get('password'),
+        'host': st.secrets['database'].get('host'),
+        'port': st.secrets['database'].get('port'),
+        'database': st.secrets['database'].get('database'),
+        'dialect': st.secrets['database'].get('dialect')
+    }
+    db_conn = Database(credentials)
 except Exception as e:
     logger.error(e)
     raise
 logger.debug('Connected to database')
 
 
-task_manager = TaskManager(database)
+task_manager = TaskManager(db_conn)
 

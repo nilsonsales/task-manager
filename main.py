@@ -10,15 +10,13 @@ from datetime import datetime
 logger = logging.getLogger()
 
 PRIORITY_NUMBER = {
-    'LOW': 1,
-    'MEDIUM': 2,
-    'HIGH': 3
+    'Low': 1,
+    'Medium': 2,
+    'High': 3
 }
 
 
 def main():
-    st.set_page_config(page_title='Simple Task Manager')
-
     selected_tab = st.sidebar.radio('Navigation',
                                     ('Home', 'Add Task', 'Tasks Details'))
 
@@ -83,18 +81,18 @@ def display_add_task():
     st.title('Add new task')
 
     # Text input fields
-    task_name = st.text_input('Task Name')
-    task_description = st.text_area('Task Description')
+    task_name = st.text_input('Task name')
+    task_description = st.text_area('Task description')
 
     # Date input field
-    due_date = st.date_input('Due Date')
+    due_date = st.date_input('Due date')
 
     # Selectbox for priority
-    priority_options = ['LOW', 'MEDIUM', 'HIGH']
+    priority_options = ['Low', 'Medium', 'High']
     priority = st.selectbox('Priority', priority_options)
 
     # Checkbox for completion status
-    is_completed = st.checkbox('Is Completed')
+    is_completed = st.checkbox('Is completed')
 
     # Submit button
     if st.button('Submit'):

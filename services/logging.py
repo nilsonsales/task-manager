@@ -1,4 +1,5 @@
 import logging
+import streamlit as st
 
 LOG_LEVELS = {
     'DEBUG': logging.DEBUG,
@@ -9,12 +10,15 @@ LOG_LEVELS = {
 }
 
 
-def setup_logger(log_level: str):
+def setup_logger():
     # Create a logger
     logger = logging.getLogger()
 
-    logger.setLevel(LOG_LEVELS.get(log_level, logging.INFO))
-    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    LOG_LEVEL = st.secrets["logging"].get("LOG_LEVEL", "INFO")
+    logger.setLevel(LOG_LEVELS.get(LOG_LEVEL, logging.INFO))
+
+    FORMATTER = st.secrets["logging"].get("FORMATTER", "%(asctime)s - %(levelname)s - %(message)s")
+    formatter = logging.Formatter(FORMATTER)
 
     # Create a handler and set the formatter
     handler = logging.StreamHandler()

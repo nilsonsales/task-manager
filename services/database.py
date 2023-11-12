@@ -1,31 +1,24 @@
-from sqlalchemy import create_engine, text
 import pandas as pd
 import logging
+
+from sqlalchemy import text, create_engine
+
 
 logger = logging.getLogger(__name__)
 
 class Database:
     def __init__(self, credentials):
         """
-        Initializes a new instance of the class.
-        Parameters:
-            credentials (dict): A dictionary containing the credentials for the database connection.
-                The dictionary must have the following keys:
-                - host (str): The host name or IP address of the database server.
-                - user (str): The username for the database connection.
-                - password (str): The password for the database connection.
-                - db_name (str): The name of the database to connect to.
-                - port (int): The port number for the database connection.
-        Returns:
-            None
+        Connect to the database
         """
+        self.dialect = credentials['dialect']
         self.host = credentials['host']
-        self.user = credentials['user']
+        self.username = credentials['username']
         self.password = credentials['password']
-        self.db_name = credentials['db_name']
+        self.db_name = credentials['database']
         self.port = credentials['port']
 
-        url = f"postgresql://{self.user}:{self.password}@{self.host}:{self.port}/{self.db_name}"
+        url = f"{self.dialect}://{self.username}:{self.password}@{self.host}:{self.port}/{self.db_name}"
         self.engine = create_engine(url)
         self.connection = self.engine.connect()
 
@@ -43,7 +36,6 @@ class Database:
         self.connection.commit()
 
     def update_data(self, id, params: dict):
-        logger.info(f"Updating task: {id}")
         columns_updates = ''.join([f'{key} = :{key}, ' for key in params.keys()])
         columns_updates = columns_updates[:-2]
 
