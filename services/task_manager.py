@@ -1,6 +1,6 @@
-
 import logging
 
+from datetime import datetime
 from .database import Database
 
 
@@ -13,7 +13,7 @@ class TaskManager:
 
     def insert_task(self, task_name, task_description, due_date,
         priority, is_completed):
-        logger.info(f"Inserting task: {task_name}")
+        logger.debug(f"Inserting task: {task_name}")
         data = {
             'task_name': task_name,
             'task_description': task_description,
@@ -24,9 +24,10 @@ class TaskManager:
         self.db_conn.insert_data(data)
         logger.info("Task inserted successfully.")
 
-    def update_task(self, task_id, new_data, updated_at):
-        # TODO: Implement this method
-        pass
+    def update_task(self, task_id, new_data: dict):
+        new_data['updated_at'] = datetime.now().astimezone()
+        self.db_conn.update_data(task_id, new_data)
+
 
     def list_in_progress_tasks(self):
         query = "SELECT * FROM task_manager.tasks WHERE is_completed = False"

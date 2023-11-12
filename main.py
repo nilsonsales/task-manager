@@ -3,6 +3,7 @@ import logging
 import pandas as pd
 import services
 
+from datetime import datetime
 
 logger = logging.getLogger()
 
@@ -14,7 +15,8 @@ PRIORITY_NUMBER = {
 
 
 def main():
-    selected_tab = st.sidebar.radio('Navigation', ('Home', 'Add Task', 'Task Details'))
+    selected_tab = st.sidebar.radio('Navigation',
+                                    ('Home', 'Add Task', 'Task Details'))
 
     if selected_tab == 'Home':
         display_home()
@@ -24,32 +26,35 @@ def main():
         display_tasks_details()
 
 
-
 def display_home():
+    from streamlit import session_state as state
+
     st.title('Simple Task Manager')
-    st.write('Welcome to the Task Manager homepage!')
-    st.write('Here you can view your tasks and manage them.')
+    st.write("Here's a list of all your tasks in progress:")
 
-    tasks = [
-        {'Task Name': 'Task 1', 'Task Description': 'Description 1', 'Due Date': '2022-01-01', 'Priority': 'LOW',
-         'Is Completed': False},
-        {'Task Name': 'Task 2', 'Task Description': 'Description 2', 'Due Date': '2022-01-02', 'Priority': 'MEDIUM',
-         'Is Completed': True},
-        {'Task Name': 'Task 3', 'Task Description': 'Description 3', 'Due Date': '2022-01-03', 'Priority': 'HIGH',
-         'Is Completed': False}
-    ]
+    in_progress_tasks = services.task_manager.list_in_progress_tasks()
+    for _, task in in_progress_tasks.iterrows():
+        task_name = task['task_name']
+        task_id = task['id']
+        task_description = task['task_description']
+        due_date = task['due_date']
 
-    # Display tasks in a clean design
-    in_progress_tasks = [task for task in tasks if not task['Is Completed']]
-    for task in in_progress_tasks:
-        task_name = task['Task Name']
-        task_description = task['Task Description']
-        is_completed = st.checkbox(f'{task_name} - {task_description}', value=task['Is Completed'])
-        if is_completed:
-            st.write('This task is completed.')
-        else:
-            st.write('This task is in progress.')
+        # Print if the task is overdue
+        if due_date < datetime.now().date():
+            st.markdown('**The task below is overdue!**')
 
+        # Use the task ID as the key for the session state variable
+        if task_id not in state:
+            state[task_id] = task['is_completed']
+
+        is_completed = st.checkbox(f'{task_name}: {task_description}', value=task['is_completed'])
+
+        if is_completed != state[task_id]:
+            if is_completed:
+                st.markdown('~~This task is completed.~~')
+                services.task_manager.update_task(task_id, {'is_completed': True})
+            else:
+                st.write('This task is in progress.')
 
 
 def display_add_task():
@@ -74,14 +79,15 @@ def display_add_task():
         # Process the form data
         process_form_data(task_name, task_description, due_date, priority, is_completed)
 
+
 def process_form_data(task_name, task_description, due_date, priority, is_completed):
     # Process the form data here (e.g., save to a database, perform actions)
-    st.write('Task Name:', task_name)
-    st.write('Task Description:', task_description)
-    st.write('Due Date:', due_date)
+    st.write('Task name:', task_name)
+    st.write('Task description:', task_description)
+    st.write('Due date:', due_date)
     st.write('Priority:', priority)
     priority = PRIORITY_NUMBER[priority]
-    st.write('Is Completed:', is_completed)
+    st.write('Is completed:', is_completed)
 
     print(f"Task name: {task_name}")
     print(f"Task description: {task_description}")
@@ -91,6 +97,7 @@ def process_form_data(task_name, task_description, due_date, priority, is_comple
 
     services.task_manager.insert_task(task_name, task_description, due_date,
                                         priority, is_completed)
+
 
 def display_tasks_details():
     # Selectbox for filtering tasks
