@@ -17,15 +17,38 @@ PRIORITY_NUMBER = {
 
 
 def main():
-    selected_tab = st.sidebar.radio('Navigation',
-                                    ('Home', 'Add Task', 'Tasks Details'))
+    # Check if the user is authenticated
+    if "user" not in st.session_state:
+        st.session_state.user = {"authenticated": False, "username": None}
 
-    if selected_tab == 'Home':
-        display_home()
-    elif selected_tab == 'Add Task':
-        display_add_task()
-    elif selected_tab == 'Tasks Details':
-        display_tasks_details()
+    # If not authenticated, show the login screen
+    if not st.session_state.user["authenticated"]:
+        st.title("Login")
+        username = st.text_input("Username")
+        password = st.text_input("Password", type="password")
+        if st.button("Login"):
+            if authenticate(username, password):
+                st.success("Login successful!")
+                st.session_state.user["authenticated"] = True
+                st.session_state.user["username"] = username
+                st.experimental_rerun()
+            else:
+                st.error("Invalid username or password")
+    else:
+        # User is authenticated, display the main content
+        selected_tab = st.sidebar.radio('Navigation', ('Home', 'Add Task', 'Tasks Details'))
+
+        if selected_tab == 'Home':
+            display_home()
+        elif selected_tab == 'Add Task':
+            display_add_task()
+        elif selected_tab == 'Tasks Details':
+            display_tasks_details()
+
+
+def authenticate(username, password):
+    # Authenticate the user
+    return services.task_manager.authenticate_user(username, password)
 
 
 def display_home():
@@ -109,14 +132,15 @@ def process_form_data(task_name, task_description, due_date, priority, is_comple
     priority = PRIORITY_NUMBER[priority]
     st.write('Is completed:', is_completed)
 
-    print(f"Task name: {task_name}")
-    print(f"Task description: {task_description}")
-    print(f"Due date: {due_date}")
-    print(f"Priority: {priority}")
-    print(f"Is completed: {is_completed}")
+    data = {
+        'task_name': task_name,
+        'task_description': task_description,
+        'due_date': due_date,
+        'priority': priority,
+        'is_completed': is_completed
+    }
 
-    services.task_manager.insert_task(task_name, task_description, due_date,
-                                        priority, is_completed)
+    services.task_manager.insert_task(data)
 
 
 def display_tasks_details():
