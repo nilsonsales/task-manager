@@ -32,11 +32,11 @@ def main():
                 st.success("Login successful!")
                 st.session_state.user["authenticated"] = True
                 st.session_state.user["username"] = username
+                # Re-run the app
                 st.rerun()
             else:
                 st.error("Invalid username or password")
     else:
-        # User is authenticated, display the main content
         selected_tab = st.sidebar.radio('Navigation', ('Home', 'Add Task', 'Tasks Details'))
 
         if selected_tab == 'Home':
@@ -57,13 +57,13 @@ def display_home():
     st.title('Simple Task Manager')
 
     # Selectbox for filtering tasks
-    filter_options = ['Tasks in progress', 'Tasks completed', 'All tasks']
+    filter_options = ['In progress', 'Completed', 'All tasks']
     filter_selection = st.selectbox('', filter_options)
 
     # Filter tasks based on selection
-    if filter_selection == 'Tasks in progress':
+    if filter_selection == 'In progress':
         filtered_tasks = services.task_manager.list_in_progress_tasks()
-    elif filter_selection == 'Tasks completed':
+    elif filter_selection == 'Completed':
         filtered_tasks = services.task_manager.list_completed_tasks()
     elif filter_selection == 'All tasks':
         filtered_tasks = services.task_manager.list_all_tasks()
