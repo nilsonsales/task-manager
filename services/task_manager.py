@@ -25,10 +25,11 @@ class TaskManager:
         logger.info("Task inserted successfully.")
 
     def update_task(self, task_id, new_data, updated_at):
+        # TODO: Implement this method
         pass
 
-    def list_open_tasks(self):
-        query = "SELECT * FROM tasks WHERE is_completed = False"
+    def list_in_progress_tasks(self):
+        query = "SELECT * FROM task_manager.tasks WHERE is_completed = False"
         results = self.db_conn.execute_select_query(query)
         return results
 

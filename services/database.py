@@ -1,5 +1,5 @@
 from sqlalchemy import create_engine, text
-from datetime import datetime
+import pandas as pd
 
 class Database:
     def __init__(self, credentials):
@@ -24,14 +24,12 @@ class Database:
         self.connection.execute(query, parameters=params)
         self.connection.commit()
 
-    def execute_select_query(self, query: str, fetchall: bool = True):
+    def execute_select_query(self, query: str):
         query = text(query)
-        result = self.connection.execute(query)
-        if result:
-            if not fetchall:
-                return result.fetchone()
-            return result.fetchall()
-        return None
+        # Load the query results into a pandas DataFrame
+        df = pd.read_sql_query(query, self.connection)
+        return df
+
 
 
 
