@@ -64,13 +64,13 @@ def display_home():
     elif filter_selection == 'All tasks':
         filtered_tasks = services.task_manager.list_all_tasks()
 
-    high_priority_tasks = filtered_tasks[filtered_tasks['priority'] == 3]
+    high_priority_tasks = filtered_tasks[filtered_tasks['priority'] == 2]
     display_tasks_in_home(high_priority_tasks, "# High Priority", "#FF5555")
 
-    medium_priority_tasks = filtered_tasks[filtered_tasks['priority'] == 2]
+    medium_priority_tasks = filtered_tasks[filtered_tasks['priority'] == 1]
     display_tasks_in_home(medium_priority_tasks, "# Medium Priority", "orange")
 
-    low_priority_tasks = filtered_tasks[filtered_tasks['priority'] == 1]
+    low_priority_tasks = filtered_tasks[filtered_tasks['priority'] == 0]
     display_tasks_in_home(low_priority_tasks, "# Low Priority", "green")
 
 
