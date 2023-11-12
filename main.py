@@ -3,6 +3,7 @@ import logging
 import pandas as pd
 import services
 
+from streamlit import session_state as state
 from datetime import datetime
 
 logger = logging.getLogger()
@@ -27,34 +28,50 @@ def main():
 
 
 def display_home():
-    from streamlit import session_state as state
-
     st.title('Simple Task Manager')
     st.write("Here's a list of all your tasks in progress:")
 
     in_progress_tasks = services.task_manager.list_in_progress_tasks()
-    for _, task in in_progress_tasks.iterrows():
-        task_name = task['task_name']
-        task_id = task['id']
-        task_description = task['task_description']
-        due_date = task['due_date']
 
-        # Print if the task is overdue
-        if due_date < datetime.now().date():
-            st.markdown('**The task below is overdue!**')
+    high_priority_tasks = in_progress_tasks[in_progress_tasks['priority'] == 3]
+    display_tasks_in_home(high_priority_tasks, "# High Priority", "#FF5555")
 
-        # Use the task ID as the key for the session state variable
-        if task_id not in state:
-            state[task_id] = task['is_completed']
+    medium_priority_tasks = in_progress_tasks[in_progress_tasks['priority'] == 2]
+    display_tasks_in_home(medium_priority_tasks, "# Medium Priority", "orange")
 
-        is_completed = st.checkbox(f'{task_name}: {task_description}', value=task['is_completed'])
+    low_priority_tasks = in_progress_tasks[in_progress_tasks['priority'] == 1]
+    display_tasks_in_home(low_priority_tasks, "# Low Priority", "green")
 
-        if is_completed != state[task_id]:
-            if is_completed:
-                st.markdown('~~This task is completed.~~')
-                services.task_manager.update_task(task_id, {'is_completed': True})
-            else:
-                st.write('This task is in progress.')
+def display_tasks_in_home(tasks, subheader, color):
+    if not tasks.empty:
+        #st.subheader(subheader)
+        st.markdown(f'<h3 style="font-size: 1.5em; color: {color}; opacity: 0.8">{subheader}</h3>', unsafe_allow_html=True)
+        for _, task in tasks.iterrows():
+            display_task_in_home(task)
+
+
+def display_task_in_home(task):
+    task_name = task['task_name']
+    task_id = task['id']
+    task_description = task['task_description']
+    due_date = task['due_date']
+
+    # Print if the task is overdue
+    if due_date < datetime.now().date():
+        st.markdown('**The task below is overdue!**')
+
+    # Use the task ID as the key for the session state variable
+    if task_id not in state:
+        state[task_id] = task['is_completed']
+
+    is_completed = st.checkbox(f'{task_name}: {task_description}', value=task['is_completed'])
+
+    if is_completed != state[task_id]:
+        if is_completed:
+            st.markdown('~~This task is completed.~~')
+            services.task_manager.update_task(task_id, {'is_completed': True})
+        else:
+            st.write('This task is in progress.')
 
 
 def display_add_task():
@@ -118,7 +135,7 @@ def display_tasks_details():
     filtered_tasks['updated_at'] = pd.to_datetime(filtered_tasks['updated_at']).dt.date
 
     # Display tasks in a dataframe
-    df = pd.DataFrame(filtered_tasks)
+    df = pd.DataFrame(filtered_tasks).sort_values(by='id', ascending=False)
     st.dataframe(df, hide_index=True)
 
 
