@@ -9,11 +9,7 @@ from datetime import datetime
 
 logger = logging.getLogger()
 
-PRIORITY_NUMBER = {
-    'Low': 1,
-    'Medium': 2,
-    'High': 3
-}
+PRIORITY_OPTIONS = ['Low', 'Medium', 'High']
 
 
 def main():
@@ -122,8 +118,7 @@ def display_add_task():
     due_date = st.date_input('Due date')
 
     # Selectbox for priority
-    priority_options = ['Low', 'Medium', 'High']
-    priority = st.selectbox('Priority', priority_options)
+    priority = st.selectbox('Priority', PRIORITY_OPTIONS)
 
     # Checkbox for completion status
     is_completed = st.checkbox('Is completed')
@@ -140,7 +135,7 @@ def process_form_data(task_name, task_description, due_date, priority, is_comple
     st.write('Task description:', task_description)
     st.write('Due date:', due_date)
     st.write('Priority:', priority)
-    priority = PRIORITY_NUMBER[priority]
+    priority = PRIORITY_OPTIONS.index(priority)
     st.write('Is completed:', is_completed)
 
     data = {
@@ -177,6 +172,42 @@ def display_tasks_details():
     # Display tasks in a dataframe
     df = pd.DataFrame(filtered_tasks).sort_values(by='id', ascending=False)
     st.dataframe(df, hide_index=True)
+
+    # Button to edit a task
+    edit_task()
+
+
+def edit_task():
+    # Add a form for editing tasks
+    st.header("Edit Task")
+    selected_task_id = st.text_input("Enter Task ID to Edit:")
+    if st.button("Edit Task") and selected_task_id:
+        task_to_edit = services.task_manager.get_task_by_id(selected_task_id)
+        if not task_to_edit.empty:
+            st.subheader("Edit Task Details")
+            print(task_to_edit['task_name'])
+
+            # Create form for editing task details
+            updated_task_name = st.text_input("Task Name", value=task_to_edit['task_name'].item())
+            updated_task_description = st.text_input("Task Description", value=task_to_edit['task_description'].item())
+            updated_due_date = st.date_input("Due Date", value=pd.to_datetime(task_to_edit['due_date'].item()).date())
+            updated_priority = st.selectbox("Priority", PRIORITY_OPTIONS, index=task_to_edit['priority'].item())
+
+            # Button to update the task
+            if st.button("Update Task"):
+                # Update the task in the database
+                updated_task = {
+                    'task_name': updated_task_name,
+                    'task_description': updated_task_description,
+                    'due_date': updated_due_date,
+                    'priority': updated_priority
+                }
+                services.task_manager.update_task(selected_task_id, updated_task)
+                st.success("Task updated successfully!")
+            else:
+                st.warning("Please fill in the required information to update the task.")
+        else:
+            st.warning("Task not found. Please enter a valid Task ID.")
 
 
 if __name__ == "__main__":

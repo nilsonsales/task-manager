@@ -39,6 +39,11 @@ class TaskManager:
         results = self.db_conn.execute_select_query(query)
         return results
 
+    def get_task_by_id(self, task_id):
+        query = f"SELECT * FROM task_manager.tasks WHERE id = {task_id} AND username = '{self.username}'"
+        task = self.db_conn.execute_select_query(query)
+        return task
+
     def authenticate_user(self, username, password):
         # Load users from secrets
         credentials = eval(st.secrets['users']['credentials'])
