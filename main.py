@@ -55,17 +55,26 @@ def authenticate(username, password):
 def display_home():
     """Displays the home page of the Simple Task Manager app."""
     st.title('Simple Task Manager')
-    st.write("Here's a list of all your tasks in progress:")
 
-    in_progress_tasks = services.task_manager.list_in_progress_tasks()
+    # Selectbox for filtering tasks
+    filter_options = ['In Progress', 'Completed', 'All']
+    filter_selection = st.selectbox('Filter Tasks', filter_options)
 
-    high_priority_tasks = in_progress_tasks[in_progress_tasks['priority'] == 3]
+    # Filter tasks based on selection
+    if filter_selection == 'In Progress':
+        filtered_tasks = services.task_manager.list_in_progress_tasks()
+    elif filter_selection == 'Completed':
+        filtered_tasks = services.task_manager.list_completed_tasks()
+    elif filter_selection == 'All':
+        filtered_tasks = services.task_manager.list_all_tasks()
+
+    high_priority_tasks = filtered_tasks[filtered_tasks['priority'] == 3]
     display_tasks_in_home(high_priority_tasks, "# High Priority", "#FF5555")
 
-    medium_priority_tasks = in_progress_tasks[in_progress_tasks['priority'] == 2]
+    medium_priority_tasks = filtered_tasks[filtered_tasks['priority'] == 2]
     display_tasks_in_home(medium_priority_tasks, "# Medium Priority", "orange")
 
-    low_priority_tasks = in_progress_tasks[in_progress_tasks['priority'] == 1]
+    low_priority_tasks = filtered_tasks[filtered_tasks['priority'] == 1]
     display_tasks_in_home(low_priority_tasks, "# Low Priority", "green")
 
 
@@ -93,11 +102,12 @@ def display_task_in_home(task):
     is_completed = st.checkbox(f'{task_name}: {task_description}', value=task['is_completed'])
 
     if is_completed != state[task_id]:
+        state[task_id] = is_completed  # Update the session state
         if is_completed:
-            st.markdown('~~This task is completed.~~')
             services.task_manager.update_task(task_id, {'is_completed': True})
         else:
-            st.write('This task is in progress.')
+            services.task_manager.update_task(task_id, {'is_completed': False})
+        st.rerun()
 
 
 def display_add_task():
