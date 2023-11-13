@@ -89,6 +89,7 @@ def display_task_in_home(task):
 
     # Print if the task is overdue
     if due_date < datetime.now().date():
+        logging.debug(f'Due date {due_date} is lower than current date {datetime.now().date()}')
         st.markdown('**The task below is overdue!**')
 
     # Use the task ID as the key for the session state variable
