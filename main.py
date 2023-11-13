@@ -75,7 +75,8 @@ def display_home():
 
 def display_tasks_in_home(tasks, subheader, color):
     if not tasks.empty:
-        st.markdown(f'<h3 style="font-size: 1.5em; color: {color}; opacity: 0.8">{subheader}</h3>', unsafe_allow_html=True)
+        st.markdown(f'<h3 style="font-size: 1.5em; color: {color}; opacity: 0.8">{subheader}</h3>',
+                    unsafe_allow_html=True)
         for _, task in tasks.iterrows():
             display_task_in_home(task)
 
@@ -98,7 +99,9 @@ def display_task_in_home(task):
     if task_id not in st.session_state.state:
         st.session_state.state[task_id] = task['is_completed']
 
-    is_completed = st.checkbox(f'{task_name}: {task_description}', value=st.session_state.state[task_id], key=task_id)
+    is_completed = st.checkbox(f'{task_name}: {task_description}',
+                               value=st.session_state.state[task_id],
+                               key=task_id)
 
     if is_completed != st.session_state.state[task_id]:
         st.session_state.state[task_id] = is_completed  # Update the session state
