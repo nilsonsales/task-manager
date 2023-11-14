@@ -12,9 +12,12 @@ PRIORITY_OPTIONS = ['Low', 'Medium', 'High']
 
 
 def main():
-    # Check if the user is authenticated
-    if "user" not in st.session_state:
-        st.session_state.user = {"authenticated": False, "username": None}
+    initialize_session_state()
+
+    if st.secrets.get('ENV') == 'local':
+        authenticate('user', 'pass')
+        st.session_state.user["authenticated"] = True
+        st.session_state.user["username"] = 'user'
 
     # If not authenticated, show the login screen
     if not st.session_state.user["authenticated"]:
@@ -40,6 +43,14 @@ def main():
             display_add_task()
         elif selected_tab == 'Tasks Details':
             display_tasks_details()
+
+
+def initialize_session_state():
+    if "user" not in st.session_state:
+        st.session_state.user = {"authenticated": False, "username": None}
+
+    if 'task_state' not in st.session_state:
+        st.session_state.task_state = {}
 
 
 def authenticate(username, password):
@@ -93,19 +104,15 @@ def display_task_in_home(task):
         st.markdown('**The task below is overdue!**')
 
     # Use the task ID as the key for the session state variable
-    if 'state' not in st.session_state:
-        st.session_state.state = {}
-
-    # Use the task ID as the key for the session state variable
-    if task_id not in st.session_state.state:
-        st.session_state.state[task_id] = task['is_completed']
+    if task_id not in st.session_state.task_state:
+        st.session_state.task_state[task_id] = task['is_completed']
 
     is_completed = st.checkbox(f'{task_name}: {task_description}',
-                               value=st.session_state.state[task_id],
+                               value=st.session_state.task_state[task_id],
                                key=task_id)
 
-    if is_completed != st.session_state.state[task_id]:
-        st.session_state.state[task_id] = is_completed  # Update the session state
+    if is_completed != st.session_state.task_state[task_id]:
+        st.session_state.task_state[task_id] = is_completed  # Update the session state
         if is_completed:
             services.task_manager.update_task(task_id, {'is_completed': True})
         else:
@@ -117,17 +124,10 @@ def display_add_task():
     """Displays a form for adding a new task."""
     st.title('Add new task')
 
-    # Text input fields
     task_name = st.text_input('Task name')
     task_description = st.text_area('Task description')
-
-    # Date input field
     due_date = st.date_input('Due date')
-
-    # Selectbox for priority
     priority = st.selectbox('Priority', PRIORITY_OPTIONS)
-
-    # Checkbox for completion status
     is_completed = st.checkbox('Is completed')
 
     # Submit button
@@ -142,14 +142,13 @@ def process_form_data(task_name, task_description, due_date, priority, is_comple
     st.write('Task description:', task_description)
     st.write('Due date:', due_date)
     st.write('Priority:', priority)
-    priority = PRIORITY_OPTIONS.index(priority)
     st.write('Is completed:', is_completed)
 
     data = {
         'task_name': task_name,
         'task_description': task_description,
         'due_date': due_date,
-        'priority': priority,
+        'priority': PRIORITY_OPTIONS.index(priority),
         'is_completed': is_completed
     }
 
