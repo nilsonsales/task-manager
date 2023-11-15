@@ -45,12 +45,10 @@ class TaskManager:
         return task
 
     def authenticate_user(self, username, password):
-        query = f"SELECT * FROM task_manager.users WHERE username = '{username}' AND password = crypt('{password}', password)"
-        user = self.db_conn.execute_select_query(query)
-        if len(user) > 0:
+        authenticated = self.db_conn.authenticate_user(username, password)
+        if authenticated:
             self.username = username
-            return True
-        return False
+        return authenticated
 
     def user_exists(self, username):
         query = f"SELECT * FROM task_manager.users WHERE username = '{username}'"

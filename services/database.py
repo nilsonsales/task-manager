@@ -53,6 +53,14 @@ class Database:
         df = pd.read_sql_query(query, self.connection)
         return df
 
+    def authenticate_user(self, username, password):
+        query = text(f"SELECT * FROM task_manager.users WHERE username = '{username}' AND password = crypt('{password}', password)")
+        result = self.connection.execute(query)
+        user = result.fetchone()
+        if len(user) > 0:
+            return True
+        return False
+
     def add_user(self, username, password):
         # Insert the user into the 'users' table
         query = text(f"INSERT INTO task_manager.users (username, password) VALUES ('{username}', crypt('{password}', gen_salt('bf')))")
