@@ -53,6 +53,14 @@ class Database:
         df = pd.read_sql_query(query, self.connection)
         return df
 
+    def add_user(self, username, password):
+        # Insert the user into the 'users' table
+        query = text(f"INSERT INTO task_manager.users (username, password) VALUES ('{username}', crypt('{password}', gen_salt('bf')))")
+
+        self.connection.execute(query)
+        self.connection.commit()
+
+
 
 
 

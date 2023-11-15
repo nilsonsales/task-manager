@@ -45,12 +45,17 @@ class TaskManager:
         return task
 
     def authenticate_user(self, username, password):
-        # Load users from secrets
-        credentials = eval(st.secrets['users']['credentials'])
+        query = f"SELECT * FROM task_manager.users WHERE username = '{username}' AND password = crypt('{password}', password)"
+        user = self.db_conn.execute_select_query(query)
+        if len(user) > 0:
+            self.username = username
+            return True
+        return False
 
-        for user in credentials:
-            if user['username'] == username and user['password'] == password:
-                self.username = username
-                return True
+    def user_exists(self, username):
+        query = f"SELECT * FROM task_manager.users WHERE username = '{username}'"
+        user = self.db_conn.execute_select_query(query)
+        if len(user) > 0:
+            return True
         return False
 

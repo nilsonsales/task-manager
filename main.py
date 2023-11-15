@@ -14,7 +14,7 @@ PRIORITY_OPTIONS = ['Low', 'Medium', 'High']
 def main():
     initialize_session_state()
 
-    if st.secrets.get('ENV') == 'local':
+    if st.secrets.get('ENV') == 'dev':
         authenticate('user', 'pass')
         st.session_state.user["authenticated"] = True
         st.session_state.user["username"] = 'user'
@@ -34,6 +34,11 @@ def main():
                 st.rerun()
             else:
                 st.error("Invalid username or password")
+
+        st.write("Don't have an account? ")
+        if st.button("Create Account") or st.session_state.display_registration_page:
+            # Redirect to the registration page or form
+            display_registration_page()
     else:
         selected_tab = st.sidebar.radio('Navigation', ('Home', 'Add Task', 'Tasks Details'))
 
@@ -52,10 +57,33 @@ def initialize_session_state():
     if 'task_state' not in st.session_state:
         st.session_state.task_state = {}
 
+    if 'display_registration_page' not in st.session_state:
+        st.session_state.display_registration_page = False
+
 
 def authenticate(username, password):
     # Authenticate the user
     return services.task_manager.authenticate_user(username, password)
+
+
+def display_registration_page():
+    st.title("Registration")
+    st.session_state.display_registration_page = True
+
+    username = st.text_input("Username", key="reg_username", type="default", value="").strip()
+    password = st.text_input("Password", key="reg_password", type="password", value="").strip()
+    confirm_password = st.text_input("Confirm Password", key="confirm_password", type="password", value="").strip()
+
+    if st.button("Register"):
+        if password != confirm_password:
+            st.error("Passwords do not match")
+        elif services.task_manager.user_exists(username):
+            st.error("Username already exists")
+        else:
+            # Add your code here to handle the registration logic
+            services.db_conn.add_user(username, password)
+            # and display a success message
+            st.success("Registration successful!")
 
 
 def display_home():
