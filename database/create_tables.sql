@@ -14,6 +14,7 @@ CREATE TABLE tasks_manager.tasks (
     created_at TIMESTAMP WITH time ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH time ZONE DEFAULT NULL
 );
+CREATE INDEX idx_username ON task_manager.tasks (username);
 
 -- Create table users
 CREATE EXTENSION pgcrypto;
