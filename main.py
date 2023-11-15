@@ -53,12 +53,12 @@ def main():
 def initialize_session_state():
     if "user" not in st.session_state:
         st.session_state.user = {"authenticated": False, "username": None}
-
     if 'task_state' not in st.session_state:
         st.session_state.task_state = {}
-
     if 'display_registration_page' not in st.session_state:
         st.session_state.display_registration_page = False
+    if 'display_edit' not in st.session_state:
+        st.session_state.display_edit = False
 
 
 def authenticate(username, password):
@@ -215,11 +215,12 @@ def edit_task():
     # Add a form for editing tasks
     st.header("Edit Task")
     selected_task_id = st.text_input("Enter Task ID to Edit:")
-    if st.button("Edit Task") and selected_task_id:
+    if st.button("Edit Task"):
+        st.session_state.display_edit = True
+    if st.session_state.display_edit and selected_task_id:
         task_to_edit = services.task_manager.get_task_by_id(selected_task_id)
         if not task_to_edit.empty:
             st.subheader("Edit Task Details")
-            print(task_to_edit['task_name'])
 
             # Create form for editing task details
             updated_task_name = st.text_input("Task Name", value=task_to_edit['task_name'].item())
@@ -234,12 +235,11 @@ def edit_task():
                     'task_name': updated_task_name,
                     'task_description': updated_task_description,
                     'due_date': updated_due_date,
-                    'priority': updated_priority
+                    'priority': PRIORITY_OPTIONS.index(updated_priority)
                 }
                 services.task_manager.update_task(selected_task_id, updated_task)
                 st.success("Task updated successfully!")
-            else:
-                st.warning("Please fill in the required information to update the task.")
+                st.session_state.display_edit = False
         else:
             st.warning("Task not found. Please enter a valid Task ID.")
 
