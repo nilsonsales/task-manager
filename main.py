@@ -130,7 +130,7 @@ def display_task_in_home(task):
     if not task['is_completed'] and due_date < datetime.now().date():
         logging.debug(f'Due date {due_date} is lower than current date {datetime.now().date()}')
 
-        text_above = "⚠️ Overdue"
+        text_above = "⚠️ overdue"
         box_html = f"""
         <div style="position:relative;">
             <div style="background-color: rgba(255, 0, 0, 0.1); padding:2px 6px; border-radius:3px; width:max-content;">
