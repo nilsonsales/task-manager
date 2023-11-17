@@ -129,13 +129,24 @@ def display_task_in_home(task):
     # Print if the task is overdue
     if not task['is_completed'] and due_date < datetime.now().date():
         logging.debug(f'Due date {due_date} is lower than current date {datetime.now().date()}')
-        st.markdown('**The task below is overdue!**')
+
+        text_above = "⚠️ Overdue"
+        box_html = f"""
+        <div style="position:relative;">
+            <div style="background-color: rgba(255, 0, 0, 0.1); padding:2px 6px; border-radius:3px; width:max-content;">
+                <p style="margin:0; font-size: 12.5px;">{text_above}</p>
+            </div>
+        </div>
+        """
+        # Display the box and the text below
+        st.markdown(box_html, unsafe_allow_html=True)
 
     # Use the task ID as the key for the session state variable
     if task_id not in st.session_state.task_state:
         st.session_state.task_state[task_id] = task['is_completed']
 
-    is_completed = st.checkbox(f'{task_name}: {task_description}',
+    separator = ': ' if task_name and task_description else ''
+    is_completed = st.checkbox(f'{task_name}{separator}{task_description}',
                                value=st.session_state.task_state[task_id],
                                key=task_id)
 
