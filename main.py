@@ -94,6 +94,7 @@ def display_home():
     filter_options = ['In progress', 'Completed', 'All tasks']
     filter_selection = st.selectbox('', filter_options)
 
+
     # Filter tasks based on selection
     if filter_selection == 'In progress':
         filtered_tasks = services.task_manager.list_in_progress_tasks()
@@ -110,6 +111,11 @@ def display_home():
 
     low_priority_tasks = filtered_tasks[filtered_tasks['priority'] == 0]
     display_tasks_in_home(low_priority_tasks, "# Low Priority", "green")
+
+    st.markdown(" ")  # This adds a horizontal line to create space
+
+    with st.expander("➕ Add Task"):
+        display_add_task()
 
 
 def display_tasks_in_home(tasks, subheader, color):
@@ -130,7 +136,7 @@ def display_task_in_home(task):
     if not task['is_completed'] and due_date < datetime.now().date():
         logging.debug(f'Due date {due_date} is lower than current date {datetime.now().date()}')
 
-        text_above = "⚠️ overdue"
+        text_above = f"⚠️ overdue on {due_date.day}/{due_date.month}"
         box_html = f"""
         <div style="position:relative;">
             <div style="background-color: rgba(255, 0, 0, 0.1); padding:2px 6px; border-radius:3px; width:max-content;">
@@ -173,6 +179,7 @@ def display_add_task():
     if st.button('Submit'):
         # Process the form data
         process_form_data(task_name, task_description, due_date, priority, is_completed)
+        st.rerun()
 
 
 def process_form_data(task_name, task_description, due_date, priority, is_completed):
