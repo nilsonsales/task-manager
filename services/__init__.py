@@ -1,8 +1,10 @@
 import streamlit as st
+import threading
 
 from .database import Database
 from .task_manager import TaskManager
 from .logging import setup_logger
+from .utils import schedule_task
 
 
 # Setup the app title
@@ -31,3 +33,7 @@ logger.debug('Connected to database')
 
 task_manager = TaskManager(db_conn)
 
+# Create a separate thread to run the scheduler
+scheduler_thread = threading.Thread(target=schedule_task, args=(task_manager.delete_old_tasks,))
+scheduler_thread.daemon = True  # Daemonize the thread to allow the main code to exit
+scheduler_thread.start()

@@ -1,6 +1,7 @@
 import pandas as pd
 import logging
 
+from datetime import datetime, timedelta
 from sqlalchemy import text, create_engine
 
 
@@ -44,6 +45,23 @@ class Database:
 
         self.connection.execute(query, parameters=params)
         self.connection.commit()
+
+    def delete_old_data(self):
+        """Deletes completed tasks older than 30 days"""
+        # Construct the query using parameters
+        query = """
+           DELETE FROM task_manager.tasks
+           WHERE is_completed = True AND updated_at < :thirty_days_ago
+           """
+        query = text(query)
+        # Get the date 30 days ago from the current date
+        thirty_days_ago = datetime.now() - timedelta(days=30)
+        print(thirty_days_ago)
+
+        # Execute the query with parameters
+        self.connection.execute(query, parameters={'thirty_days_ago': thirty_days_ago})
+        self.connection.commit()
+
 
     def execute_select_query(self, query: str):
         query = text(query)

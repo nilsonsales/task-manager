@@ -1,5 +1,4 @@
 import logging
-import streamlit as st
 
 from datetime import datetime
 from .database import Database
@@ -44,13 +43,20 @@ class TaskManager:
         task = self.db_conn.execute_select_query(query)
         return task
 
+    def delete_old_tasks(self):
+        logging.debug("Deleting old tasks")
+        self.db_conn.delete_old_data()
+
+
     def authenticate_user(self, username, password):
+        logger.debug(f"Authenticating user: {username}")
         authenticated = self.db_conn.authenticate_user(username, password)
         if authenticated:
             self.username = username
         return authenticated
 
     def user_exists(self, username):
+        logger.debug(f"Checking if user exists: {username}")
         query = f"SELECT * FROM task_manager.users WHERE username = '{username}'"
         user = self.db_conn.execute_select_query(query)
         if len(user) > 0:
