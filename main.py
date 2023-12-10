@@ -14,10 +14,11 @@ PRIORITY_OPTIONS = ['Low', 'Medium', 'High']
 def main():
     initialize_session_state()
 
-    if st.secrets.get('ENV') == 'dev':
-        authenticate('user', 'pass')
-        st.session_state.user["authenticated"] = True
-        st.session_state.user["username"] = 'user'
+    # if st.secrets.get('ENV') == 'dev':
+    #     # Automatically authenticate the user for development purposes
+    #     authenticate('user', 'pass')
+    #     st.session_state.user["authenticated"] = True
+    #     st.session_state.user["username"] = 'user'
 
     # If not authenticated, show the login screen
     if not st.session_state.user["authenticated"]:
@@ -26,7 +27,7 @@ def main():
         password = st.text_input("Password", key="password", type="password", value="").strip()
 
         if st.button("Login"):
-            if authenticate(username, password):
+            if username and password and authenticate(username, password):
                 st.success("Login successful!")
                 st.session_state.user["authenticated"] = True
                 st.session_state.user["username"] = username
@@ -75,7 +76,9 @@ def display_registration_page():
     confirm_password = st.text_input("Confirm Password", key="confirm_password", type="password", value="").strip()
 
     if st.button("Register"):
-        if password != confirm_password:
+        if not username or not password:
+            st.error("Please enter a username and password")
+        elif password != confirm_password:
             st.error("Passwords do not match")
         elif services.task_manager.user_exists(username):
             st.error("Username already exists")
