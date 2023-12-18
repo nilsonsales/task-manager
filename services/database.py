@@ -57,7 +57,7 @@ class Database:
         query = text(f"SELECT * FROM task_manager.users WHERE username = '{username}' AND password = crypt('{password}', password)")
         result = self.connection.execute(query)
         user = result.fetchone()
-        if len(user) > 0:
+        if user:
             return True
         return False
 
