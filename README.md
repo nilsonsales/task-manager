@@ -7,3 +7,4 @@ Functions:
 - Export to CSV;
 
 ![alt text](https://github.com/nilsonsales/task-manager/blob/master/imgs/home_page.png?raw=true)
+
