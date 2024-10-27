@@ -3,7 +3,7 @@ CREATE DATABASE task_manager;
 CREATE SCHEMA task_manager;
 
 -- Create table tasks
-CREATE TABLE tasks_manager.tasks (
+CREATE TABLE task_manager.tasks (
 	id BIGSERIAL PRIMARY KEY,
     task_name VARCHAR(255),
     task_description TEXT,
